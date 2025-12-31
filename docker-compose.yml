@@ -37,11 +37,17 @@ services:
       db:
         condition: service_healthy
 
-  # 3. Backend (FastAPI) - Uncomment in next step
-  # backend:
-  #   build: ./backend
-  #   container_name: academic_api
-  #   ports: ["8000:8000"]
+  # 3. Backend (FastAPI)
+  backend:
+    build: ./backend
+    container_name: academic_api
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-academic_rag}
+    depends_on:
+      db:
+        condition: service_healthy
 
 volumes:
   postgres_data:
