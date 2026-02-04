@@ -11,6 +11,9 @@ class User(Base):
     hashed_password = Column(String)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=func.now())
+    
+    # Relationships
+    assignments = relationship("Assignment", back_populates="creator")
 
 class Assignment(Base):
     __tablename__ = "assignments"
@@ -19,10 +22,12 @@ class Assignment(Base):
     title = Column(String, index=True)
     description = Column(Text, nullable=True)
     due_date = Column(DateTime, nullable=True)
-    status = Column(String, default="pending")
+    status = Column(String, default="draft")
+    created_by = Column(Integer, ForeignKey("users.id"))
     created_at = Column(DateTime, default=func.now())
     
-    # Relationship: One assignment can have many related documents
+    # Relationships
+    creator = relationship("User", back_populates="assignments")
     documents = relationship("Document", back_populates="assignment")
 
 class Document(Base):

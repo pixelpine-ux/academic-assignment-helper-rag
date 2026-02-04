@@ -8,7 +8,7 @@ class AssignmentBase(BaseModel):
     due_date: Optional[datetime] = None
 
 class AssignmentCreate(AssignmentBase):
-    pass
+    created_by: int
 
 class AssignmentUpdate(BaseModel):
     title: Optional[str] = None
@@ -19,6 +19,7 @@ class AssignmentUpdate(BaseModel):
 class Assignment(AssignmentBase):
     id: int
     status: str
+    created_by: int
     created_at: datetime
 
     class Config:

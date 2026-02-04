@@ -2,13 +2,18 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 from database import get_db
-from models import Assignment
+from models import Assignment, User
 from app.schemas.assignment import AssignmentCreate, AssignmentUpdate, Assignment as AssignmentSchema
 
 router = APIRouter(prefix="/assignments", tags=["assignments"])
 
 @router.post("/", response_model=AssignmentSchema)
 def create_assignment(assignment: AssignmentCreate, db: Session = Depends(get_db)):
+    # Validate user exists
+    user = db.query(User).filter(User.id == assignment.created_by).first()
+    if not user:
+        raise HTTPException(status_code=400, detail="Invalid user ID")
+    
     db_assignment = Assignment(**assignment.dict())
     db.add(db_assignment)
     db.commit()
@@ -34,6 +39,13 @@ def update_assignment(assignment_id: int, assignment_update: AssignmentUpdate, d
         raise HTTPException(status_code=404, detail="Assignment not found")
     
     update_data = assignment_update.dict(exclude_unset=True)
+    
+    # Validate status if being updated
+    if "status" in update_data:
+        valid_statuses = ["draft", "published", "submitted", "graded"]
+        if update_data["status"] not in valid_statuses:
+            raise HTTPException(status_code=400, detail=f"Invalid status. Must be one of: {valid_statuses}")
+    
     for field, value in update_data.items():
         setattr(assignment, field, value)
     
