@@ -37,7 +37,7 @@ def get_assignments(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
     user_id: Optional[int] = Query(None, description="Filter by user ID"),
-    status: Optional[str] = Query(None, regex="^(draft|published|submitted|graded)$"),
+    status: Optional[str] = Query(None, pattern="^(draft|published|submitted|graded)$"),
     due_before: Optional[datetime] = Query(None, description="Filter assignments due before this date"),
     db: Session = Depends(get_db)
 ):

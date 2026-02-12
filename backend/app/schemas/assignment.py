@@ -20,7 +20,7 @@ class AssignmentUpdate(BaseModel):
     title: Optional[str] = Field(None, min_length=1, max_length=200)
     description: Optional[str] = Field(None, max_length=2000)
     due_date: Optional[datetime] = None
-    status: Optional[str] = Field(None, regex='^(draft|published|submitted|graded)$')
+    status: Optional[str] = Field(None, pattern='^(draft|published|submitted|graded)$')
     
     @validator('due_date')
     def due_date_must_be_future(cls, v):
