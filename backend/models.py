@@ -14,6 +14,7 @@ class User(Base):
     
     # Relationships
     assignments = relationship("Assignment", back_populates="creator")
+    documents = relationship("Document", back_populates="uploader")
 
 class Assignment(Base):
     __tablename__ = "assignments"
@@ -37,8 +38,23 @@ class Document(Base):
     filename = Column(String)
     content = Column(Text)
     doc_metadata = Column(JSON, nullable=True)
-    embedding = Column(Vector(1536))  # Vector dimension for embeddings
-    
+
+    uploaded_by = Column(Integer, ForeignKey("users.id"), nullable=False)
     assignment_id = Column(Integer, ForeignKey("assignments.id"), nullable=True)
+
+    uploader = relationship("User", back_populates="documents")
     assignment = relationship("Assignment", back_populates="documents")
+    chunks = relationship("DocumentChunk", back_populates="document", cascade="all, delete-orphan")
     created_at = Column(DateTime, default=func.now())
+
+
+class DocumentChunk(Base):
+    __tablename__ = "document_chunks"
+
+    id = Column(Integer, primary_key=True, index=True)
+    chunk_text = Column(Text, nullable=False)
+    chunk_index = Column(Integer, nullable=False)  # position in the document (0, 1, 2...)
+    embedding = Column(Vector(1536), nullable=False)
+
+    document_id = Column(Integer, ForeignKey("documents.id"), nullable=False)
+    document = relationship("Document", back_populates="chunks")
