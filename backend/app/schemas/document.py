@@ -1,6 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, computed_field
 from datetime import datetime
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 
 class DocumentBase(BaseModel):
     filename: str
@@ -12,8 +12,14 @@ class DocumentCreate(DocumentBase):
 
 class Document(DocumentBase):
     id: int
+    uploaded_by: int
     assignment_id: Optional[int]
     created_at: datetime
+
+    @computed_field
+    @property
+    def chunk_count(self) -> int:
+        return len(self.chunks) if hasattr(self, 'chunks') and self.chunks else 0
 
     class Config:
         from_attributes = True

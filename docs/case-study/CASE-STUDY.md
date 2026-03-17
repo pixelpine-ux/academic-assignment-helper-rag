@@ -229,7 +229,55 @@ Each failure has a different cause and a different fix. Catching them all as one
 generic `Exception` and saying "something went wrong" is useless to whoever is
 debugging at 2am. Specific exceptions with specific messages is professional practice.
 
-The service also checks the API key before making the call. If the key is missing,
+The service also checks the API key before making the call — a fast-fail pattern that avoids a wasted network round-trip when the configuration is obviously wrong.
+
+---
+
+## Step 4 — Wiring the Upload Endpoint (Completed)
+
+### What Was Built
+- The `/documents/upload` endpoint now chunks the uploaded text and generates an embedding for each chunk
+- All `DocumentChunk` rows are persisted in a single transaction with the parent `Document`
+- All document endpoints (`GET /`, `GET /:id`, `DELETE /:id`) are now scoped to the authenticated user
+- The response schema exposes `uploaded_by` and a computed `chunk_count`
+
+### The `db.flush()` Pattern
+
+The upload endpoint needs the `Document.id` before the transaction is committed — because each `DocumentChunk` row needs `document_id` as a foreign key.
+
+`db.flush()` sends the INSERT to the database and makes the auto-generated `id` available in Python, but does not commit. The entire operation — document row + all chunk rows — is committed together at the end. If embedding generation fails halfway through, nothing is written. The database stays clean.
+
+This is called an **atomic transaction**: all-or-nothing. Either the document and all its chunks are saved, or none of them are.
+
+```
+db.add(document)
+db.flush()          ← id is now available, transaction still open
+for chunk in chunks:
+    db.add(DocumentChunk(document_id=document.id, ...))
+db.commit()         ← everything lands at once
+```
+
+### Why All Endpoints Got Auth
+
+The GET and DELETE endpoints previously had no authentication. That meant any unauthenticated caller could list or delete any document in the system.
+
+Adding `current_user = Depends(get_current_user)` to every endpoint and filtering all queries by `uploaded_by == current_user.id` closes this. A user can only see and delete their own documents. This is the same data scoping principle applied consistently across the entire resource.
+
+### The Flow End-to-End
+
+```
+POST /documents/upload
+  │
+  ├── JWT verified → current_user resolved
+  ├── file.read() → raw text
+  ├── Document row created, db.flush() → document.id available
+  ├── chunk_text(content) → [chunk_0, chunk_1, ..., chunk_n]
+  ├── for each chunk: get_embedding(chunk) → [1536 floats]
+  ├── DocumentChunk row created per chunk
+  └── db.commit() → everything persisted atomically
+```
+
+This is the first moment in the project where all three layers — the API, the services, and the database — work together as one system.l. If the key is missing,
 it raises a clear `ValueError` immediately — rather than letting the OpenAI client
 make the call and return a cryptic library error.
 
