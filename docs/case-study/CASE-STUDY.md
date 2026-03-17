@@ -277,7 +277,63 @@ POST /documents/upload
   └── db.commit() → everything persisted atomically
 ```
 
-This is the first moment in the project where all three layers — the API, the services, and the database — work together as one system.l. If the key is missing,
+This is the first moment in the project where all three layers — the API, the services, and the database — work together as one system.
+
+---
+
+## Step 5 — RAG Query Endpoint (Completed)
+
+### What Was Built
+- `vector_search_service.py` — embeds the question and retrieves the top 5 most similar chunks from `document_chunks`, scoped to the current user
+- `llm_service.py` — builds a grounded prompt from retrieved chunks and calls GPT-3.5-turbo to generate an answer with source citations
+- `api/query.py` — single `POST /query` endpoint that wires both services together
+- `schemas/query.py` — typed request/response shapes
+
+### How the Vector Search Works
+
+pgvector exposes a cosine distance operator (`<=>`). The query sorts all chunks belonging to the user's documents by how close their embedding is to the question's embedding, and takes the top 5.
+
+```
+question → get_embedding() → [1536 floats]
+         → ORDER BY chunk.embedding <=> question_embedding
+         → LIMIT 5
+         → top 5 most semantically similar chunks
+```
+
+Cosine distance measures the angle between two vectors. A distance of 0 means identical meaning. A distance of 1 means completely unrelated. The closest chunks are the most relevant to the question.
+
+The query is also filtered by `Document.uploaded_by == user_id` — the same data scoping pattern applied in Step 4. The vector search only ever touches the current user's documents.
+
+### Why Temperature 0.2 on the LLM Call
+
+Temperature controls how creative (random) the model's output is. A temperature of 1.0 means the model freely picks from many possible next tokens — good for creative writing, bad for factual Q&A. A temperature of 0.2 keeps the model close to the most probable tokens — it stays grounded in the context it was given and is less likely to hallucinate.
+
+For a system where accuracy and traceability matter, low temperature is the right call.
+
+### The Prompt Design
+
+The prompt does three things:
+1. Constrains the model — "answer using ONLY the provided sources"
+2. Requires citation — "cite the source number when you use information from it"
+3. Handles the no-answer case — "if the answer cannot be found in the sources, say so explicitly"
+
+Without constraint 1, the model will blend its training data with the retrieved context and you lose the grounding that makes RAG valuable. Without constraint 3, the model will hallucinate an answer rather than admit it doesn't know.
+
+### The Full RAG Flow End-to-End
+
+```
+POST /query  { "question": "What is the main argument of this essay?" }
+  │
+  ├── JWT verified → current_user resolved
+  ├── get_embedding(question) → [1536 floats]
+  ├── SELECT chunks ORDER BY embedding <=> question_embedding
+  │   WHERE document.uploaded_by = user_id LIMIT 5
+  ├── Build prompt: system instruction + source blocks + question
+  ├── GPT-3.5-turbo → grounded answer with [Source N] citations
+  └── Return: { answer, source_document_ids, chunks_used }
+```
+
+This is the complete RAG loop. The system no longer answers from training data alone — every answer is grounded in the user's actual uploaded documents.l. If the key is missing,
 it raises a clear `ValueError` immediately — rather than letting the OpenAI client
 make the call and return a cryptic library error.
 

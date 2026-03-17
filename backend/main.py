@@ -6,7 +6,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 from database import engine, get_db
 import models
-from app.api import auth, assignments, documents
+from app.api import auth, assignments, documents, query
 from app.core.dependencies import get_current_user
 
 load_dotenv()
@@ -30,6 +30,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(assignments.router, dependencies=[Depends(get_current_user)])
 app.include_router(documents.router, dependencies=[Depends(get_current_user)])
+app.include_router(query.router, dependencies=[Depends(get_current_user)])
 
 @app.on_event("startup")
 def on_startup():
