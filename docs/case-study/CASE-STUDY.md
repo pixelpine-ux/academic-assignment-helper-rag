@@ -333,9 +333,7 @@ POST /query  { "question": "What is the main argument of this essay?" }
   └── Return: { answer, source_document_ids, chunks_used }
 ```
 
-This is the complete RAG loop. The system no longer answers from training data alone — every answer is grounded in the user's actual uploaded documents.l. If the key is missing,
-it raises a clear `ValueError` immediately — rather than letting the OpenAI client
-make the call and return a cryptic library error.
+This is the complete RAG loop. The system no longer answers from training data alone — every answer is grounded in the user's actual uploaded documents.
 
 ---
 
