@@ -37,6 +37,7 @@ def on_startup():
     # Enable pgvector extension
     with engine.connect() as connection:
         connection.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+        connection.execute(text("ALTER TABLE documents ADD COLUMN IF NOT EXISTS content_hash VARCHAR"))
         connection.commit()
     
     # Create database tables

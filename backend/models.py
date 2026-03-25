@@ -38,6 +38,7 @@ class Document(Base):
     filename = Column(String)
     content = Column(Text)
     doc_metadata = Column(JSON, nullable=True)
+    content_hash = Column(String, nullable=True, index=True)
 
     uploaded_by = Column(Integer, ForeignKey("users.id"), nullable=False)
     assignment_id = Column(Integer, ForeignKey("assignments.id"), nullable=True)
