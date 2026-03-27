@@ -34,14 +34,21 @@ app.include_router(query.router, dependencies=[Depends(get_current_user)])
 
 @app.on_event("startup")
 def on_startup():
-    # Enable pgvector extension
+    # Enable pgvector extension and create tables first
     with engine.connect() as connection:
         connection.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
-        connection.execute(text("ALTER TABLE documents ADD COLUMN IF NOT EXISTS content_hash VARCHAR"))
         connection.commit()
-    
-    # Create database tables
+
+    # Create tables (skips existing ones)
     models.Base.metadata.create_all(bind=engine)
+
+    # Migrate existing tables — safe to run on every startup
+    with engine.connect() as connection:
+        try:
+            connection.execute(text("ALTER TABLE documents ADD COLUMN IF NOT EXISTS content_hash VARCHAR"))
+            connection.commit()
+        except Exception as e:
+            print(f"Migration warning (non-fatal): {e}")
 
 @app.get("/")
 def read_root():
