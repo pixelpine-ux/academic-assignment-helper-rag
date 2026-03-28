@@ -1,3 +1,4 @@
+import hashlib
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from sqlalchemy.orm import Session
 from typing import List, Optional
@@ -19,10 +20,12 @@ async def upload_document(
 ):
     content = await file.read()
     content_str = content.decode('utf-8')
+    content_hash = hashlib.sha256(content).hexdigest()
 
     db_document = Document(
         filename=file.filename,
         content=content_str,
+        content_hash=content_hash,
         assignment_id=assignment_id,
         uploaded_by=current_user.id,
         doc_metadata={"size": len(content), "content_type": file.content_type}
