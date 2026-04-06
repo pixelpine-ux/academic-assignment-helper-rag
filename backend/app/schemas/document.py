@@ -12,6 +12,7 @@ class DocumentCreate(DocumentBase):
 
 class Document(DocumentBase):
     id: int
+    content_hash: Optional[str] = None
     uploaded_by: int
     assignment_id: Optional[int]
     created_at: datetime
