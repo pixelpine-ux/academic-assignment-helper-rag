@@ -1,0 +1,5 @@
+This is a sample text document for testing file upload functionality.
+
+It contains multiple paragraphs to simulate a real academic document.
+
+The content should be properly extracted and chunked for RAG processing.
