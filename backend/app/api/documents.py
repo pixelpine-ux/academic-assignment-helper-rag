@@ -6,8 +6,10 @@ from database import get_db
 from models import Document, DocumentChunk, User
 from app.schemas.document import DocumentCreate, Document as DocumentSchema
 from app.core.dependencies import get_current_user
+from app.core.file_validator import validate_file
 from app.services.chunking_service import chunk_text
 from app.services.embedding_service import get_embedding
+from app.services.file_parser_service import extract_text_from_file
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 
@@ -18,8 +20,15 @@ async def upload_document(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
+    validate_file(file)
+    
     content = await file.read()
-    content_str = content.decode('utf-8')
+    
+    try:
+        content_str = extract_text_from_file(content, file.filename)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    
     content_hash = hashlib.sha256(content).hexdigest()
 
     db_document = Document(
