@@ -31,6 +31,16 @@ async def upload_document(
     
     content_hash = hashlib.sha256(content).hexdigest()
 
+    existing = db.query(Document).filter(
+        Document.content_hash == content_hash,
+        Document.uploaded_by == current_user.id
+    ).first()
+    if existing:
+        raise HTTPException(
+            status_code=409,
+            detail={"message": "Exact duplicate detected.", "matched_document_id": existing.id}
+        )
+
     db_document = Document(
         filename=file.filename,
         content=content_str,

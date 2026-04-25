@@ -80,6 +80,28 @@ def test_query_requires_auth(client):
     assert response.status_code == 403
 
 
+# ── Duplicate detection on upload ──────────────────────────────────────────────
+
+@patch("app.api.documents.get_embedding", return_value=FAKE_EMBEDDING)
+@patch("app.api.documents.chunk_text", return_value=["some chunk"])
+def test_upload_duplicate_returns_409(mock_chunk, mock_embed, client, auth_headers):
+    file_content = b"Identical content for duplicate test."
+    client.post(
+        "/documents/upload",
+        files={"file": ("original.txt", file_content, "text/plain")},
+        headers=auth_headers,
+    )
+    response = client.post(
+        "/documents/upload",
+        files={"file": ("copy.txt", file_content, "text/plain")},
+        headers=auth_headers,
+    )
+    assert response.status_code == 409
+    data = response.json()
+    assert "matched_document_id" in data["detail"]
+    assert data["detail"]["message"] == "Exact duplicate detected."
+
+
 @patch("app.api.query.search_chunks", return_value=[])
 def test_query_404_when_no_documents(mock_search, client, auth_headers):
     """A user with no uploaded documents should get a 404, not a 500."""

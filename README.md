@@ -9,6 +9,14 @@ A production-grade academic support system that automates assignment analysis us
 - **Automation:** n8n
 - **Containerization:** Docker & Docker Compose
 - **AI/ML:** OpenAI Embeddings (or local LLM)
+- **File Processing:** PyPDF2, python-docx (PDF, DOCX, TXT support)
+
+## Features
+- **Document Upload:** Supports PDF, DOCX, and TXT files (max 10MB)
+- **RAG-Powered Q&A:** Ask questions about uploaded documents
+- **Plagiarism Detection:** Hash-based and semantic similarity checks
+- **Multi-Tenant Security:** User isolation with JWT authentication
+- **Vector Search:** Fast semantic search with pgvector
 
 ##  Getting Started
 
@@ -26,6 +34,13 @@ A production-grade academic support system that automates assignment analysis us
    ```bash
    docker-compose up -d
    ```
+4. Access the API documentation at `http://localhost:8000/docs`
+
+### Supported File Formats
+- **PDF** (.pdf) - Extracted using PyPDF2
+- **Word Documents** (.docx) - Extracted using python-docx
+- **Text Files** (.txt) - UTF-8 and Latin-1 encoding
+- **File Size Limit:** 10MB per file
 
 ##  License
 MIT

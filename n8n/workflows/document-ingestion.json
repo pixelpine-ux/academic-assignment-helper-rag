@@ -1,0 +1,206 @@
+{
+  "name": "Document Ingestion Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "minutes", "minutesInterval": 5 }]
+        }
+      },
+      "id": "trigger-schedule",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.API_BASE_URL }}/health/db",
+        "options": {}
+      },
+      "id": "health-check",
+      "name": "API Health Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "healthy",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ]
+        }
+      },
+      "id": "check-healthy",
+      "name": "Is API Healthy?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.API_BASE_URL }}/auth/login",
+        "method": "POST",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            { "name": "username", "value": "={{ $env.API_USER_EMAIL }}" },
+            { "name": "password", "value": "={{ $env.API_USER_PASSWORD }}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "authenticate",
+      "name": "Get Auth Token",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [900, 220]
+    },
+    {
+      "parameters": {
+        "jsCode": "const token = $input.first().json.access_token;\nif (!token) throw new Error('Authentication failed — no access_token in response');\nreturn [{ json: { token } }];"
+      },
+      "id": "extract-token",
+      "name": "Extract Token",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 220]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Simulate a batch of pending documents.\n// In production, replace this with a real source:\n// - Read from a watched folder via filesystem node\n// - Query a database table of pending uploads\n// - Pull from an S3 bucket listing\nconst pendingFiles = [\n  { filename: 'essay_batch_1.txt', content: 'Sample essay content for batch processing.' },\n  { filename: 'report_batch_2.txt', content: 'Sample report content for batch processing.' }\n];\nreturn pendingFiles.map(f => ({ json: f }));"
+      },
+      "id": "get-pending-files",
+      "name": "Get Pending Files",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1340, 220]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.API_BASE_URL }}/documents/upload",
+        "method": "POST",
+        "authentication": "genericCredentialType",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Extract Token').first().json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "={{ $json.filename }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": { "fullResponse": true }
+          }
+        }
+      },
+      "id": "upload-document",
+      "name": "Upload Document",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1560, 220],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.statusCode }}",
+              "rightValue": 409,
+              "operator": { "type": "number", "operation": "equals" }
+            }
+          ]
+        }
+      },
+      "id": "check-duplicate",
+      "name": "Is Duplicate?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1780, 220]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst detail = item.body?.detail || {};\nconsole.log(`[DUPLICATE] ${item.filename} matches document ID ${detail.matched_document_id}`);\nreturn [{ json: { status: 'duplicate', filename: item.filename, matched_document_id: detail.matched_document_id } }];"
+      },
+      "id": "log-duplicate",
+      "name": "Log Duplicate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2000, 140]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst body = item.body || item;\nif (item.statusCode && item.statusCode !== 200) {\n  console.error(`[ERROR] Upload failed for ${body.filename}: status ${item.statusCode}`);\n  return [{ json: { status: 'error', filename: body.filename, statusCode: item.statusCode } }];\n}\nconsole.log(`[SUCCESS] Uploaded document ID ${body.id} — ${body.filename} (${body.chunk_count ?? '?'} chunks)`);\nreturn [{ json: { status: 'success', document_id: body.id, filename: body.filename } }];"
+      },
+      "id": "log-result",
+      "name": "Log Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2000, 300]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [[{ "node": "API Health Check", "type": "main", "index": 0 }]]
+    },
+    "API Health Check": {
+      "main": [[{ "node": "Is API Healthy?", "type": "main", "index": 0 }]]
+    },
+    "Is API Healthy?": {
+      "main": [
+        [{ "node": "Get Auth Token", "type": "main", "index": 0 }],
+        []
+      ]
+    },
+    "Get Auth Token": {
+      "main": [[{ "node": "Extract Token", "type": "main", "index": 0 }]]
+    },
+    "Extract Token": {
+      "main": [[{ "node": "Get Pending Files", "type": "main", "index": 0 }]]
+    },
+    "Get Pending Files": {
+      "main": [[{ "node": "Upload Document", "type": "main", "index": 0 }]]
+    },
+    "Upload Document": {
+      "main": [[{ "node": "Is Duplicate?", "type": "main", "index": 0 }]]
+    },
+    "Is Duplicate?": {
+      "main": [
+        [{ "node": "Log Duplicate", "type": "main", "index": 0 }],
+        [{ "node": "Log Result", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "tags": ["academic-helper", "document-ingestion"],
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}
