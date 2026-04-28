@@ -10,7 +10,11 @@ venv/
 # Docker & Database
 postgres_data/
 n8n_data/
+redis_data/
 
 # IDEs
 .vscode/
 .idea/
+
+# Test scripts
+test_*.sh
