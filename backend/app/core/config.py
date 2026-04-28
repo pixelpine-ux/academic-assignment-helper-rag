@@ -12,5 +12,8 @@ class Settings:
     FRONTEND_URL = os.getenv("FRONTEND_URL")
     if FRONTEND_URL:
         CORS_ORIGINS.append(FRONTEND_URL)
+    
+    # Redis Configuration
+    REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 
 settings = Settings()

@@ -1,5 +1,5 @@
 import hashlib
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Request
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from database import get_db
@@ -7,6 +7,7 @@ from models import Document, DocumentChunk, User
 from app.schemas.document import DocumentCreate, Document as DocumentSchema
 from app.core.dependencies import get_current_user
 from app.core.file_validator import validate_file
+from app.core.rate_limiter import upload_limiter, docs_limiter
 from app.services.chunking_service import chunk_text
 from app.services.embedding_service import get_embedding
 from app.services.file_parser_service import extract_text_from_file
@@ -15,11 +16,15 @@ router = APIRouter(prefix="/documents", tags=["documents"])
 
 @router.post("/upload", response_model=DocumentSchema)
 async def upload_document(
+    request: Request,
     file: UploadFile = File(...),
     assignment_id: Optional[int] = Form(None),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
+    # Rate limiting: 5 uploads per hour
+    await upload_limiter.check_rate_limit(request, str(current_user.id))
+    
     validate_file(file)
     
     content = await file.read()
@@ -67,12 +72,16 @@ async def upload_document(
     return db_document
 
 @router.get("/", response_model=List[DocumentSchema])
-def get_documents(
+async def get_documents(
+    request: Request,
     skip: int = 0,
     limit: int = 100,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
+    # Rate limiting: 100 requests per minute
+    await docs_limiter.check_rate_limit(request, str(current_user.id))
+    
     return db.query(Document).filter(Document.uploaded_by == current_user.id).offset(skip).limit(limit).all()
 
 @router.get("/{document_id}", response_model=DocumentSchema)
