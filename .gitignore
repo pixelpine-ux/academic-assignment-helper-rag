@@ -18,3 +18,5 @@ redis_data/
 
 # Test scripts
 test_*.sh
+
+/docs

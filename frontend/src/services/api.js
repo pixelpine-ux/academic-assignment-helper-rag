@@ -105,10 +105,15 @@ export const auth = {
       body: JSON.stringify({ email, password }),
     });
     
-    // Store token
-    if (data.access_token) {
-      setToken(data.access_token);
+    if (!data?.access_token) {
+      throw {
+        status: 0,
+        message: 'Login succeeded but no access token was returned.',
+        data,
+      };
     }
+
+    setToken(data.access_token);
     
     return data;
   },
@@ -179,13 +184,12 @@ export const documents = {
 
 export const query = {
   /**
-   * Ask a question about a document
+   * Ask a question (searches across all user documents)
    */
-  ask: async (documentId, question) => {
-    return await apiRequest('/query/ask', {
+  ask: async (question) => {
+    return await apiRequest('/query/', {
       method: 'POST',
       body: JSON.stringify({
-        document_id: documentId,
         question,
       }),
     });

@@ -1,16 +1,74 @@
-# React + Vite
+# Academic Assignment Helper - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Quick Start
 
-Currently, two official plugins are available:
+```bash
+npm install
+npm run dev
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Access at: http://localhost:5173
 
-## React Compiler
+## Test Credentials
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Create a new account or use:
+- Email: `newuser@test.com`
+- Password: `password123`
 
-## Expanding the ESLint configuration
+## Testing the App
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. **Visit Test Page**: http://localhost:5173/test
+   - Click "Run All Tests" to verify backend connectivity
+   - All tests should pass (green)
+
+2. **Register**: Create a new account
+3. **Login**: Use your credentials
+4. **Dashboard**: Upload documents and ask questions
+
+## Troubleshooting
+
+### Login Returns 401 Error
+
+**Cause**: Rate limiting (5 attempts per 15 minutes) or wrong password
+
+**Solutions**:
+1. Wait 15 minutes if rate limited
+2. Create a new account with different email
+3. Check backend logs: `docker logs academic_api`
+
+### Backend Connection Failed
+
+**Check**:
+```bash
+# Verify backend is running
+curl http://localhost:8000/
+
+# Check .env file
+cat .env
+# Should have: VITE_API_URL=http://localhost:8000
+```
+
+### CORS Errors
+
+Backend CORS is configured for all origins. If you see CORS errors:
+1. Restart backend: `docker-compose restart backend`
+2. Check browser console for actual error
+
+## API Endpoints
+
+- `POST /auth/register` - Create account
+- `POST /auth/login` - Get JWT token
+- `GET /documents/` - List documents
+- `POST /documents/upload` - Upload file
+- `DELETE /documents/{id}` - Delete document
+- `POST /query/ask` - Ask question about document
+
+## Features
+
+✅ JWT Authentication with localStorage
+✅ Protected routes
+✅ File upload (PDF, DOCX, TXT)
+✅ Document management (list, delete)
+✅ RAG-powered Q&A with source citations
+✅ Error handling and loading states
+✅ Responsive design
