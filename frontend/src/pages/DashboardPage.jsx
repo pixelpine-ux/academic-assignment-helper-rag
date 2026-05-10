@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { documents, query } from '../services/api';
+import { useToast } from '../components/ui/Toast';
 import Sidebar from '../components/ui/Sidebar';
 import ChatMessage from '../components/ui/ChatMessage';
 import ChatInput from '../components/ui/ChatInput';
@@ -12,8 +13,8 @@ export default function DashboardPage() {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState('');
   const messagesEndRef = useRef(null);
+  const toast = useToast();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -28,9 +29,9 @@ export default function DashboardPage() {
       const data = await documents.list();
       setDocs(data);
     } catch {
-      setError('Failed to load documents');
+      toast.error('Failed to load documents');
     }
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     loadDocuments();
@@ -41,13 +42,13 @@ export default function DashboardPage() {
     if (!file) return;
 
     setUploading(true);
-    setError('');
     try {
       await documents.upload(file);
       await loadDocuments();
+      toast.success(`${file.name} uploaded successfully`);
       e.target.value = '';
     } catch (err) {
-      setError(err.message || 'Upload failed');
+      toast.error(err.message || 'Upload failed');
     } finally {
       setUploading(false);
     }
@@ -58,12 +59,13 @@ export default function DashboardPage() {
     try {
       await documents.delete(id);
       await loadDocuments();
+      toast.success('Document deleted');
       if (selectedDoc?.id === id) {
         setSelectedDoc(null);
         setMessages([]);
       }
     } catch {
-      setError('Delete failed');
+      toast.error('Delete failed');
     }
   };
 
@@ -71,7 +73,6 @@ export default function DashboardPage() {
     const userMsg = { role: 'user', content: question };
     setMessages(prev => [...prev, userMsg]);
     setLoading(true);
-    setError('');
 
     try {
       const response = await query.ask(question);
@@ -82,7 +83,7 @@ export default function DashboardPage() {
         chunks_used: response.chunks_used
       }]);
     } catch (err) {
-      setError(err.message || 'Query failed');
+      toast.error(err.message || 'Query failed');
       setMessages(prev => prev.slice(0, -1));
     } finally {
       setLoading(false);
@@ -91,6 +92,7 @@ export default function DashboardPage() {
 
   const handleCopy = (text) => {
     navigator.clipboard.writeText(text);
+    toast.success('Copied to clipboard');
   };
 
   const handleNewChat = () => {
@@ -129,7 +131,6 @@ export default function DashboardPage() {
           {loading && <TypingIndicator />}
           <div ref={messagesEndRef} />
         </div>
-        {error && <div className="dashboard-error">{error}</div>}
         <ChatInput
           onSend={handleSend}
           disabled={loading}
