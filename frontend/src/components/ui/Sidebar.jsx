@@ -1,5 +1,6 @@
-import { Plus, FileText, Settings, User, Trash2, MessageSquare, History } from 'lucide-react';
+import { Plus, FileText, Settings, User, Trash2, MessageSquare, LogOut } from 'lucide-react';
 import Button from './Button';
+import { useAuth } from '../../context/AuthContext';
 import './Sidebar.css';
 
 export default function Sidebar({ 
@@ -16,6 +17,8 @@ export default function Sidebar({
   onDeleteChat,
   onClearHistory
 }) {
+  const { user, logout } = useAuth();
+
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
@@ -119,13 +122,15 @@ export default function Sidebar({
       </div>
 
       <div className="sidebar-footer">
-        <button className="sidebar-footer-btn">
-          <Settings size={18} />
-          <span>Settings</span>
-        </button>
-        <button className="sidebar-footer-btn">
-          <User size={18} />
-          <span>Profile</span>
+        {user && (
+          <div className="sidebar-user-info">
+            <User size={16} />
+            <span className="sidebar-user-email">{user.email || 'User'}</span>
+          </div>
+        )}
+        <button className="sidebar-footer-btn" onClick={logout}>
+          <LogOut size={18} />
+          <span>Logout</span>
         </button>
       </div>
     </aside>
