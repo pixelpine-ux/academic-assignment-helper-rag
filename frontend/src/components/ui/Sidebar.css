@@ -21,6 +21,9 @@
   flex: 1;
   overflow-y: auto;
   padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
 }
 
 .sidebar-section-title {
@@ -31,6 +34,102 @@
   font-weight: 600;
   color: var(--text-secondary);
   margin-bottom: var(--space-md);
+}
+
+.sidebar-clear-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: var(--space-xs);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  transition: all var(--transition-fast);
+}
+
+.sidebar-clear-btn:hover {
+  background-color: var(--error);
+  color: white;
+}
+
+.sidebar-chats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.sidebar-chat-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md);
+  background-color: var(--bg-primary);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: 1px solid transparent;
+}
+
+.sidebar-chat-item:hover {
+  background-color: var(--bg-tertiary);
+}
+
+.sidebar-chat-item.active {
+  border-color: var(--accent-primary);
+  background-color: var(--bg-tertiary);
+}
+
+.sidebar-chat-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.sidebar-chat-title {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-chat-date {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  margin-top: var(--space-xs);
+}
+
+.sidebar-chat-delete {
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: var(--space-xs);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  transition: all var(--transition-fast);
+}
+
+.sidebar-chat-item:hover .sidebar-chat-delete {
+  opacity: 1;
+}
+
+.sidebar-chat-delete:hover {
+  background-color: var(--error);
+  color: white;
+}
+
+.sidebar-empty {
+  padding: var(--space-lg);
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
 }
 
 .sidebar-upload-btn {

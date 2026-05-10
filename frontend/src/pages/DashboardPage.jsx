@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { documents, query } from '../services/api';
 import { useToast } from '../components/ui/Toast';
+import { useChatHistory } from '../hooks/useChatHistory';
 import Sidebar from '../components/ui/Sidebar';
 import ChatMessage from '../components/ui/ChatMessage';
 import ChatInput from '../components/ui/ChatInput';
@@ -13,8 +14,10 @@ export default function DashboardPage() {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [currentChatId, setCurrentChatId] = useState(null);
   const messagesEndRef = useRef(null);
   const toast = useToast();
+  const { history, createChat, addMessage, deleteChat, clearHistory, getChat } = useChatHistory();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -70,18 +73,29 @@ export default function DashboardPage() {
   };
 
   const handleSend = async (question) => {
+    // Create new chat if none exists
+    let chatId = currentChatId;
+    if (!chatId) {
+      const newChat = createChat();
+      chatId = newChat.id;
+      setCurrentChatId(chatId);
+    }
+
     const userMsg = { role: 'user', content: question };
     setMessages(prev => [...prev, userMsg]);
+    addMessage(chatId, userMsg);
     setLoading(true);
 
     try {
       const response = await query.ask(question);
-      setMessages(prev => [...prev, {
+      const assistantMsg = {
         role: 'assistant',
         content: response.answer,
         sources: response.source_document_ids || [],
         chunks_used: response.chunks_used
-      }]);
+      };
+      setMessages(prev => [...prev, assistantMsg]);
+      addMessage(chatId, assistantMsg);
     } catch (err) {
       toast.error(err.message || 'Query failed');
       setMessages(prev => prev.slice(0, -1));
@@ -98,6 +112,28 @@ export default function DashboardPage() {
   const handleNewChat = () => {
     setMessages([]);
     setSelectedDoc(null);
+    setCurrentChatId(null);
+  };
+
+  const handleSelectChat = (chat) => {
+    setCurrentChatId(chat.id);
+    setMessages(chat.messages);
+    setSelectedDoc(null);
+  };
+
+  const handleDeleteChat = (chatId) => {
+    deleteChat(chatId);
+    if (currentChatId === chatId) {
+      handleNewChat();
+    }
+    toast.success('Chat deleted');
+  };
+
+  const handleClearHistory = () => {
+    if (clearHistory()) {
+      handleNewChat();
+      toast.success('Chat history cleared');
+    }
   };
 
   return (
@@ -105,11 +141,16 @@ export default function DashboardPage() {
       <Sidebar
         documents={docs}
         selectedDoc={selectedDoc}
-        onSelectDoc={(doc) => { setSelectedDoc(doc); setMessages([]); }}
+        onSelectDoc={(doc) => { setSelectedDoc(doc); setMessages([]); setCurrentChatId(null); }}
         onNewChat={handleNewChat}
         onUpload={handleUpload}
         onDelete={handleDelete}
         uploading={uploading}
+        chatHistory={history}
+        selectedChat={currentChatId ? getChat(currentChatId) : null}
+        onSelectChat={handleSelectChat}
+        onDeleteChat={handleDeleteChat}
+        onClearHistory={handleClearHistory}
       />
       <main className="dashboard-main">
         <div className="dashboard-chat">

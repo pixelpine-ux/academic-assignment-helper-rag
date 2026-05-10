@@ -1,4 +1,4 @@
-import { Plus, FileText, Settings, User, Trash2 } from 'lucide-react';
+import { Plus, FileText, Settings, User, Trash2, MessageSquare, History } from 'lucide-react';
 import Button from './Button';
 import './Sidebar.css';
 
@@ -9,7 +9,12 @@ export default function Sidebar({
   onNewChat, 
   onUpload, 
   onDelete,
-  uploading 
+  uploading,
+  chatHistory = [],
+  selectedChat,
+  onSelectChat,
+  onDeleteChat,
+  onClearHistory
 }) {
   return (
     <aside className="sidebar">
@@ -22,6 +27,52 @@ export default function Sidebar({
         >
           New Chat
         </Button>
+      </div>
+
+      <div className="sidebar-section">
+        <div className="sidebar-section-title">
+          <MessageSquare size={16} />
+          <span>Recent Chats</span>
+          {chatHistory.length > 0 && (
+            <button 
+              className="sidebar-clear-btn"
+              onClick={onClearHistory}
+              title="Clear all history"
+            >
+              <Trash2 size={14} />
+            </button>
+          )}
+        </div>
+        <div className="sidebar-chats">
+          {chatHistory.length === 0 ? (
+            <div className="sidebar-empty">No chat history yet</div>
+          ) : (
+            chatHistory.slice(0, 10).map(chat => (
+              <div
+                key={chat.id}
+                className={`sidebar-chat-item ${selectedChat?.id === chat.id ? 'active' : ''}`}
+                onClick={() => onSelectChat(chat)}
+              >
+                <div className="sidebar-chat-info">
+                  <div className="sidebar-chat-title">{chat.title}</div>
+                  <div className="sidebar-chat-date">
+                    {new Date(chat.updatedAt).toLocaleDateString()}
+                  </div>
+                </div>
+                <button
+                  className="sidebar-chat-delete"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDeleteChat(chat.id);
+                  }}
+                  title="Delete chat"
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            ))
+          )}
+        </div>
       </div>
 
       <div className="sidebar-section">
