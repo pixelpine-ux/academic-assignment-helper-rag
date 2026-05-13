@@ -1,0 +1,141 @@
+.assignments-page {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.back-button:hover {
+  color: var(--accent-primary);
+}
+
+.assignments-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+.assignments-header h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2rem;
+  color: var(--text-primary);
+}
+
+.assignments-subtitle {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.assignments-filters {
+  margin-bottom: 2rem;
+}
+
+.filter-tabs {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 2px solid var(--border-color);
+  overflow-x: auto;
+}
+
+.filter-tab {
+  background: none;
+  border: none;
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.filter-tab:hover {
+  color: var(--text-primary);
+}
+
+.filter-tab.active {
+  color: var(--accent-primary);
+  border-bottom-color: var(--accent-primary);
+}
+
+.filter-count {
+  background: var(--bg-tertiary);
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.filter-tab.active .filter-count {
+  background: var(--accent-primary);
+  color: white;
+}
+
+.assignments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.assignments-loading {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-secondary);
+}
+
+.assignments-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.assignments-empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.assignments-empty h2 {
+  margin: 0 0 0.5rem 0;
+  color: var(--text-primary);
+}
+
+.assignments-empty p {
+  margin: 0 0 1.5rem 0;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+  .assignments-page {
+    padding: 1rem;
+  }
+
+  .assignments-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .assignments-grid {
+    grid-template-columns: 1fr;
+  }
+}

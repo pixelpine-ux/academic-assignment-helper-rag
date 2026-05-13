@@ -188,6 +188,59 @@ export const documents = {
 };
 
 // ============================================
+// Assignments API
+// ============================================
+
+export const assignments = {
+  /**
+   * Get all assignments for current user
+   */
+  list: async (filters = {}) => {
+    const params = new URLSearchParams();
+    if (filters.status) params.append('status', filters.status);
+    if (filters.user_id) params.append('user_id', filters.user_id);
+    const query = params.toString() ? `?${params.toString()}` : '';
+    return await apiRequest(`/assignments/${query}`);
+  },
+  
+  /**
+   * Create a new assignment
+   */
+  create: async (assignmentData) => {
+    return await apiRequest('/assignments/', {
+      method: 'POST',
+      body: JSON.stringify(assignmentData),
+    });
+  },
+  
+  /**
+   * Get a specific assignment
+   */
+  get: async (assignmentId) => {
+    return await apiRequest(`/assignments/${assignmentId}`);
+  },
+  
+  /**
+   * Update an assignment
+   */
+  update: async (assignmentId, assignmentData) => {
+    return await apiRequest(`/assignments/${assignmentId}`, {
+      method: 'PUT',
+      body: JSON.stringify(assignmentData),
+    });
+  },
+  
+  /**
+   * Delete an assignment
+   */
+  delete: async (assignmentId) => {
+    return await apiRequest(`/assignments/${assignmentId}`, {
+      method: 'DELETE',
+    });
+  },
+};
+
+// ============================================
 // Query API (Q&A)
 // ============================================
 
@@ -222,6 +275,7 @@ export const health = {
 export default {
   auth,
   documents,
+  assignments,
   query,
   health,
 };

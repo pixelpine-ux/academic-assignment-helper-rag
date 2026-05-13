@@ -5,6 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import DashboardPage from './pages/DashboardPage'
+import AssignmentsPage from './pages/AssignmentsPage'
 import UploadPage from './pages/UploadPage'
 import TestPage from './pages/TestPage'
 
@@ -35,6 +36,11 @@ function App() {
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <DashboardPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/assignments" element={
+              <ProtectedRoute>
+                <AssignmentsPage />
               </ProtectedRoute>
             } />
             <Route path="/upload" element={

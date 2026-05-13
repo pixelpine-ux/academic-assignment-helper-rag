@@ -1,6 +1,7 @@
-import { Plus, FileText, Settings, User, Trash2, MessageSquare, LogOut, Shield } from 'lucide-react';
+import { Plus, FileText, Settings, User, Trash2, MessageSquare, LogOut, Shield, ClipboardList } from 'lucide-react';
 import Button from './Button';
 import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import './Sidebar.css';
 
 export default function Sidebar({ 
@@ -19,6 +20,7 @@ export default function Sidebar({
   onClearHistory
 }) {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <aside className="sidebar">
@@ -135,6 +137,10 @@ export default function Sidebar({
       </div>
 
       <div className="sidebar-footer">
+        <button className="sidebar-footer-btn" onClick={() => navigate('/assignments')}>
+          <ClipboardList size={18} />
+          <span>Assignments</span>
+        </button>
         {user && (
           <div className="sidebar-user-info">
             <User size={16} />
