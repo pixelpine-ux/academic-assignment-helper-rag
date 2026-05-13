@@ -176,6 +176,15 @@ export const documents = {
       method: 'DELETE',
     });
   },
+  
+  /**
+   * Check document for plagiarism
+   */
+  checkPlagiarism: async (documentId) => {
+    return await apiRequest(`/documents/${documentId}/check-plagiarism`, {
+      method: 'POST',
+    });
+  },
 };
 
 // ============================================

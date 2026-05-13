@@ -221,6 +221,39 @@
   color: white;
 }
 
+.sidebar-doc-actions {
+  display: flex;
+  gap: var(--space-xs);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.sidebar-doc-item:hover .sidebar-doc-actions {
+  opacity: 1;
+}
+
+.sidebar-doc-action {
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: var(--space-xs);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  transition: all var(--transition-fast);
+}
+
+.sidebar-doc-action:hover {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.sidebar-doc-action:first-child:hover {
+  background-color: var(--accent-primary);
+  color: white;
+}
+
 .sidebar-footer {
   padding: var(--space-lg);
   border-top: 1px solid var(--border-primary);

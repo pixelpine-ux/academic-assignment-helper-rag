@@ -1,4 +1,4 @@
-import { Plus, FileText, Settings, User, Trash2, MessageSquare, LogOut } from 'lucide-react';
+import { Plus, FileText, Settings, User, Trash2, MessageSquare, LogOut, Shield } from 'lucide-react';
 import Button from './Button';
 import { useAuth } from '../../context/AuthContext';
 import './Sidebar.css';
@@ -10,6 +10,7 @@ export default function Sidebar({
   onNewChat, 
   onUpload, 
   onDelete,
+  onCheckPlagiarism,
   uploading,
   chatHistory = [],
   selectedChat,
@@ -106,16 +107,28 @@ export default function Sidebar({
                   {new Date(doc.created_at).toLocaleDateString()}
                 </div>
               </div>
-              <button
-                className="sidebar-doc-delete"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDelete(doc.id);
-                }}
-                title="Delete document"
-              >
-                <Trash2 size={14} />
-              </button>
+              <div className="sidebar-doc-actions">
+                <button
+                  className="sidebar-doc-action"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onCheckPlagiarism(doc.id);
+                  }}
+                  title="Check plagiarism"
+                >
+                  <Shield size={14} />
+                </button>
+                <button
+                  className="sidebar-doc-action"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(doc.id);
+                  }}
+                  title="Delete document"
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
             </div>
           ))}
         </div>

@@ -6,6 +6,7 @@ import Sidebar from '../components/ui/Sidebar';
 import ChatMessage from '../components/ui/ChatMessage';
 import ChatInput from '../components/ui/ChatInput';
 import TypingIndicator from '../components/ui/TypingIndicator';
+import PlagiarismModal from '../components/ui/PlagiarismModal';
 import './DashboardPage.css';
 
 export default function DashboardPage() {
@@ -15,6 +16,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [currentChatId, setCurrentChatId] = useState(null);
+  const [plagiarismResult, setPlagiarismResult] = useState(null);
   const messagesEndRef = useRef(null);
   const toast = useToast();
   const { history, createChat, addMessage, deleteChat, clearHistory, getChat } = useChatHistory();
@@ -136,6 +138,15 @@ export default function DashboardPage() {
     }
   };
 
+  const handleCheckPlagiarism = async (docId) => {
+    try {
+      const result = await documents.checkPlagiarism(docId);
+      setPlagiarismResult(result);
+    } catch (err) {
+      toast.error(err.message || 'Plagiarism check failed');
+    }
+  };
+
   return (
     <div className="dashboard">
       <Sidebar
@@ -145,6 +156,7 @@ export default function DashboardPage() {
         onNewChat={handleNewChat}
         onUpload={handleUpload}
         onDelete={handleDelete}
+        onCheckPlagiarism={handleCheckPlagiarism}
         uploading={uploading}
         chatHistory={history}
         selectedChat={currentChatId ? getChat(currentChatId) : null}
@@ -178,6 +190,12 @@ export default function DashboardPage() {
           onFileAttach={() => document.querySelector('input[type="file"]')?.click()}
         />
       </main>
+      {plagiarismResult && (
+        <PlagiarismModal
+          result={plagiarismResult}
+          onClose={() => setPlagiarismResult(null)}
+        />
+      )}
     </div>
   );
 }

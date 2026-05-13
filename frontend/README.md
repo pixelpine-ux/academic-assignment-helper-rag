@@ -70,5 +70,7 @@ Backend CORS is configured for all origins. If you see CORS errors:
 ✅ File upload (PDF, DOCX, TXT)
 ✅ Document management (list, delete)
 ✅ RAG-powered Q&A with source citations
+✅ **Plagiarism Detection** (hash + semantic similarity)
+✅ Chat history persistence
 ✅ Error handling and loading states
-✅ Responsive design
+✅ Responsive design with dark mode
