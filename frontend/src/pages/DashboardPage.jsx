@@ -165,30 +165,38 @@ export default function DashboardPage() {
         onClearHistory={handleClearHistory}
       />
       <main className="dashboard-main">
-        <div className="dashboard-chat">
-          {messages.length === 0 ? (
-            <div className="dashboard-empty">
-              <div className="dashboard-empty-icon">💬</div>
-              <h2>Start a conversation</h2>
-              <p>Upload a document or ask a question to get started</p>
-            </div>
-          ) : (
-            messages.map((msg, i) => (
-              <ChatMessage
-                key={i}
-                message={msg}
-                onCopy={handleCopy}
-              />
-            ))
-          )}
-          {loading && <TypingIndicator />}
-          <div ref={messagesEndRef} />
+        <div className="dashboard-chat-wrapper">
+          <div className="dashboard-chat">
+            {messages.length === 0 ? (
+              <div className="dashboard-empty">
+                <div className="dashboard-empty-animation">
+                  <div className="gradient-orb orb-1"></div>
+                  <div className="gradient-orb orb-2"></div>
+                  <div className="gradient-orb orb-3"></div>
+                </div>
+                <div className="dashboard-empty-content">
+                  <h2>Start a conversation</h2>
+                  <p>Upload a document and ask questions to get AI-powered insights and answers</p>
+                </div>
+              </div>
+            ) : (
+              messages.map((msg, i) => (
+                <ChatMessage
+                  key={i}
+                  message={msg}
+                  onCopy={handleCopy}
+                />
+              ))
+            )}
+            {loading && <TypingIndicator />}
+            <div ref={messagesEndRef} />
+          </div>
+          <ChatInput
+            onSend={handleSend}
+            disabled={loading}
+            onFileAttach={() => document.querySelector('input[type="file"]')?.click()}
+          />
         </div>
-        <ChatInput
-          onSend={handleSend}
-          disabled={loading}
-          onFileAttach={() => document.querySelector('input[type="file"]')?.click()}
-        />
       </main>
       {plagiarismResult && (
         <PlagiarismModal

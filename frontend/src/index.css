@@ -1,23 +1,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
 :root {
-  /* Colors - Dark Theme */
-  --bg-primary: #1a1a1a;
-  --bg-secondary: #2d2d2d;
-  --bg-tertiary: #3a3a3a;
-  --bg-input: #2d2d2d;
-  --bg-code: #1e1e1e;
+  /* Colors - Enhanced Dark Theme */
+  --bg-primary: #0f0f1e;
+  --bg-secondary: #1a1a2e;
+  --bg-tertiary: #252536;
+  --bg-input: #1e1e2e;
+  --bg-code: #16162a;
   
-  --text-primary: #ececec;
-  --text-secondary: #b4b4b4;
-  --text-tertiary: #8e8e8e;
+  --text-primary: #f0f0f5;
+  --text-secondary: #b8b8c8;
+  --text-tertiary: #8a8a9a;
   
   --accent-primary: #10a37f;
   --accent-hover: #0d8a6a;
   --accent-secondary: #6e56cf;
+  --accent-tertiary: #3b82f6;
   
-  --border-primary: #404040;
-  --border-focus: #565656;
+  --border-primary: #2d2d3f;
+  --border-focus: #3d3d5f;
   
   --error: #ef4444;
   --success: #10b981;
@@ -51,10 +52,11 @@
   --radius-full: 9999px;
   
   /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 20px rgba(110, 86, 207, 0.3);
   
   /* Transitions */
   --transition-fast: 150ms ease-in-out;
