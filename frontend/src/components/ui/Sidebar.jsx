@@ -1,4 +1,4 @@
-import { Plus, FileText, Settings, User, Trash2, MessageSquare, LogOut, Shield, ClipboardList } from 'lucide-react';
+import { Plus, FileText, User, Trash2, MessageSquare, LogOut, Shield, ClipboardList } from 'lucide-react';
 import Button from './Button';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -17,7 +17,8 @@ export default function Sidebar({
   selectedChat,
   onSelectChat,
   onDeleteChat,
-  onClearHistory
+  onClearHistory,
+  onOpenProfile
 }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -141,12 +142,10 @@ export default function Sidebar({
           <ClipboardList size={18} />
           <span>Assignments</span>
         </button>
-        {user && (
-          <div className="sidebar-user-info">
-            <User size={16} />
-            <span className="sidebar-user-email">{user.email || 'User'}</span>
-          </div>
-        )}
+        <button className="sidebar-footer-btn" onClick={onOpenProfile}>
+          <User size={18} />
+          <span>Profile</span>
+        </button>
         <button className="sidebar-footer-btn" onClick={logout}>
           <LogOut size={18} />
           <span>Logout</span>

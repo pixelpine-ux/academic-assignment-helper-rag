@@ -7,6 +7,7 @@ import ChatMessage from '../components/ui/ChatMessage';
 import ChatInput from '../components/ui/ChatInput';
 import TypingIndicator from '../components/ui/TypingIndicator';
 import PlagiarismModal from '../components/ui/PlagiarismModal';
+import UserProfile from '../components/ui/UserProfile';
 import './DashboardPage.css';
 
 export default function DashboardPage() {
@@ -17,6 +18,7 @@ export default function DashboardPage() {
   const [uploading, setUploading] = useState(false);
   const [currentChatId, setCurrentChatId] = useState(null);
   const [plagiarismResult, setPlagiarismResult] = useState(null);
+  const [showProfile, setShowProfile] = useState(false);
   const messagesEndRef = useRef(null);
   const toast = useToast();
   const { history, createChat, addMessage, deleteChat, clearHistory, getChat } = useChatHistory();
@@ -163,6 +165,7 @@ export default function DashboardPage() {
         onSelectChat={handleSelectChat}
         onDeleteChat={handleDeleteChat}
         onClearHistory={handleClearHistory}
+        onOpenProfile={() => setShowProfile(true)}
       />
       <main className="dashboard-main">
         <div className="dashboard-chat-wrapper">
@@ -203,6 +206,9 @@ export default function DashboardPage() {
           result={plagiarismResult}
           onClose={() => setPlagiarismResult(null)}
         />
+      )}
+      {showProfile && (
+        <UserProfile onClose={() => setShowProfile(false)} />
       )}
     </div>
   );
