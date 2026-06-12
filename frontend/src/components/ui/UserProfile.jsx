@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { users } from '../../services/userService';
 import { useToast } from '../ui/Toast';
 import PasswordChangeModal from './PasswordChangeModal';
+import Skeleton from './Skeleton';
 import { User, FileText, ClipboardList, Shield, Activity, Key } from 'lucide-react';
 import './UserProfile.css';
 
@@ -34,8 +35,24 @@ export default function UserProfile({ onClose }) {
   if (loading) {
     return (
       <div className="modal-overlay" onClick={onClose}>
-        <div className="modal-content" onClick={e => e.stopPropagation()}>
-          <div className="profile-loading">Loading...</div>
+        <div className="modal-content profile-modal" onClick={e => e.stopPropagation()}>
+          <div className="modal-header">
+            <h2>Profile</h2>
+            <button className="modal-close" onClick={onClose}>×</button>
+          </div>
+          <div className="modal-body">
+            {/* Loading skeleton - shows structure while loading */}
+            <div className="profile-section">
+              <Skeleton type="circle" />
+              <div style={{ flex: 1 }}>
+                <Skeleton type="text" width="60%" />
+                <Skeleton type="text" width="40%" />
+              </div>
+            </div>
+            <div className="stats-grid">
+              <Skeleton type="stat" count={4} />
+            </div>
+          </div>
         </div>
       </div>
     );

@@ -18,6 +18,7 @@ export default function DashboardPage() {
   const [uploading, setUploading] = useState(false);
   const [currentChatId, setCurrentChatId] = useState(null);
   const [plagiarismResult, setPlagiarismResult] = useState(null);
+  const [checkingPlagiarism, setCheckingPlagiarism] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const messagesEndRef = useRef(null);
   const toast = useToast();
@@ -141,11 +142,15 @@ export default function DashboardPage() {
   };
 
   const handleCheckPlagiarism = async (docId) => {
+    setCheckingPlagiarism(true);
+    toast.info('Checking for plagiarism...');
     try {
       const result = await documents.checkPlagiarism(docId);
       setPlagiarismResult(result);
     } catch (err) {
       toast.error(err.message || 'Plagiarism check failed');
+    } finally {
+      setCheckingPlagiarism(false);
     }
   };
 
@@ -160,6 +165,7 @@ export default function DashboardPage() {
         onDelete={handleDelete}
         onCheckPlagiarism={handleCheckPlagiarism}
         uploading={uploading}
+        checkingPlagiarism={checkingPlagiarism}
         chatHistory={history}
         selectedChat={currentChatId ? getChat(currentChatId) : null}
         onSelectChat={handleSelectChat}

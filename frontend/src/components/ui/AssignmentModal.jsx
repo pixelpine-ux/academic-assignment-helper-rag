@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Button from './Button';
 import './AssignmentModal.css';
 
-export default function AssignmentModal({ assignment, onSave, onClose }) {
+export default function AssignmentModal({ assignment, onSave, onClose, saving }) {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -103,11 +103,11 @@ export default function AssignmentModal({ assignment, onSave, onClose }) {
           </div>
 
           <div className="modal-footer">
-            <Button type="button" variant="secondary" onClick={onClose}>
+            <Button type="button" variant="secondary" onClick={onClose} disabled={saving}>
               Cancel
             </Button>
-            <Button type="submit" variant="primary">
-              {assignment ? 'Update' : 'Create'}
+            <Button type="submit" variant="primary" disabled={saving}>
+              {saving ? 'Saving...' : (assignment ? 'Update' : 'Create')}
             </Button>
           </div>
         </form>

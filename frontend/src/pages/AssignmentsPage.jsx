@@ -15,6 +15,7 @@ export default function AssignmentsPage() {
   const [showModal, setShowModal] = useState(false);
   const [editingAssignment, setEditingAssignment] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [saving, setSaving] = useState(false);
   const toast = useToast();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -60,6 +61,7 @@ export default function AssignmentsPage() {
   };
 
   const handleSave = async (assignmentData) => {
+    setSaving(true);
     try {
       if (editingAssignment) {
         await assignments.update(editingAssignment.id, assignmentData);
@@ -72,6 +74,8 @@ export default function AssignmentsPage() {
       await loadAssignments();
     } catch (err) {
       toast.error(err.message || 'Save failed');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -147,6 +151,7 @@ export default function AssignmentsPage() {
           assignment={editingAssignment}
           onSave={handleSave}
           onClose={() => setShowModal(false)}
+          saving={saving}
         />
       )}
     </div>

@@ -18,7 +18,8 @@ export default function Sidebar({
   onSelectChat,
   onDeleteChat,
   onClearHistory,
-  onOpenProfile
+  onOpenProfile,
+  checkingPlagiarism
 }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -118,6 +119,7 @@ export default function Sidebar({
                     onCheckPlagiarism(doc.id);
                   }}
                   title="Check plagiarism"
+                  disabled={checkingPlagiarism}
                 >
                   <Shield size={14} />
                 </button>
