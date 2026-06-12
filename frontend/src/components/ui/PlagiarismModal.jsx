@@ -1,3 +1,4 @@
+import Button from './Button';
 import './PlagiarismModal.css';
 
 export default function PlagiarismModal({ result, onClose }) {
@@ -83,7 +84,7 @@ export default function PlagiarismModal({ result, onClose }) {
         </div>
 
         <div className="modal-footer">
-          <button className="btn btn-primary" onClick={onClose}>Close</button>
+          <Button variant="primary" onClick={onClose}>Close</Button>
         </div>
       </div>
     </div>

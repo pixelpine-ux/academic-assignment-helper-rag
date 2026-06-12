@@ -106,8 +106,8 @@ export default function AssignmentModal({ assignment, onSave, onClose, saving })
             <Button type="button" variant="secondary" onClick={onClose} disabled={saving}>
               Cancel
             </Button>
-            <Button type="submit" variant="primary" disabled={saving}>
-              {saving ? 'Saving...' : (assignment ? 'Update' : 'Create')}
+            <Button type="submit" variant="primary" loading={saving}>
+              {assignment ? 'Update' : 'Create'}
             </Button>
           </div>
         </form>

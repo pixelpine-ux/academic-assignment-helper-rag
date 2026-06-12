@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { users } from '../../services/userService';
 import { useToast } from '../ui/Toast';
 import { Lock } from 'lucide-react';
+import Button from './Button';
 import './PasswordChangeModal.css';
 
 export default function PasswordChangeModal({ onClose }) {
@@ -126,21 +127,21 @@ export default function PasswordChangeModal({ onClose }) {
             </div>
 
             <div className="modal-footer">
-              <button 
+              <Button 
                 type="button" 
-                className="btn btn-secondary" 
+                variant="secondary" 
                 onClick={onClose}
                 disabled={loading}
               >
                 Cancel
-              </button>
-              <button 
+              </Button>
+              <Button 
                 type="submit" 
-                className="btn btn-primary"
-                disabled={loading}
+                variant="primary"
+                loading={loading}
               >
-                {loading ? 'Changing...' : 'Change Password'}
-              </button>
+                Change Password
+              </Button>
             </div>
           </form>
         </div>
