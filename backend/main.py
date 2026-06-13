@@ -8,8 +8,25 @@ from database import engine, get_db
 import models
 from app.api import auth, assignments, documents, query, plagiarism, users
 from app.core.dependencies import get_current_user
+import sentry_sdk
+from sentry_sdk.integrations.fastapi import FastApiIntegration
+from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 
 load_dotenv()
+
+# Initialize Sentry for error monitoring
+if os.getenv("SENTRY_DSN"):
+    sentry_sdk.init(
+        dsn=os.getenv("SENTRY_DSN"),
+        integrations=[
+            FastApiIntegration(),
+            SqlalchemyIntegration(),
+        ],
+        traces_sample_rate=0.1,  # 10% of requests for performance monitoring
+        profiles_sample_rate=0.1,  # 10% for profiling
+        environment=os.getenv("ENVIRONMENT", "development"),
+        release=os.getenv("APP_VERSION", "1.0.0"),
+    )
 
 app = FastAPI(
     title="Academic Assignment Helper API",
@@ -67,3 +84,12 @@ def check_db_connection(db: Session = Depends(get_db)):
         return {"status": "healthy", "database_response": result.scalar()}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database connection failed: {str(e)}")
+
+@app.get("/sentry-debug")
+def trigger_sentry_error():
+    """
+    Test endpoint to verify Sentry error tracking works.
+    Remove or disable in production.
+    """
+    division_by_zero = 1 / 0
+    return {"this": "will never be reached"}
