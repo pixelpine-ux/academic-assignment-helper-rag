@@ -17,6 +17,8 @@ A production-grade academic support system that automates assignment analysis us
 - **Plagiarism Detection:** Hash-based and semantic similarity checks
 - **Multi-Tenant Security:** User isolation with JWT authentication
 - **Vector Search:** Fast semantic search with pgvector
+- **Rate Limiting:** Redis-backed API throttling to prevent abuse
+- **Error Monitoring:** Sentry integration for production debugging
 
 ##  Getting Started
 
@@ -41,6 +43,35 @@ A production-grade academic support system that automates assignment analysis us
 - **Word Documents** (.docx) - Extracted using python-docx
 - **Text Files** (.txt) - UTF-8 and Latin-1 encoding
 - **File Size Limit:** 10MB per file
+
+## 🚀 Deployment
+
+### Production Deployment (Free Options)
+See [FREE_HOSTING_OPTIONS.md](FREE_HOSTING_OPTIONS.md) for detailed guides on:
+- **Render.com** (Recommended for $0 budget)
+- Railway, Koyeb, Fly.io alternatives
+- Step-by-step setup instructions
+
+### Error Monitoring Setup
+See [SENTRY_SETUP.md](SENTRY_SETUP.md) for Sentry integration:
+- Free tier: 5K errors/month
+- Automatic error tracking with stack traces
+- Performance monitoring included
+
+### Environment Variables
+Copy `.env.example` to `.env` and configure:
+```bash
+# Required
+OPENAI_API_KEY=sk-your-key
+SECRET_KEY=your-secret-key
+DATABASE_URL=postgresql://...
+REDIS_URL=redis://...
+
+# Optional (Production)
+SENTRY_DSN=https://your-dsn@sentry.io/project
+ENVIRONMENT=production
+FRONTEND_URL=https://yourdomain.com
+```
 
 ##  License
 MIT
